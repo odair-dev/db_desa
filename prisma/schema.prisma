@@ -9,3 +9,67 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Type_user {
+  admin
+  realtor
+  client
+}
+
+enum Category_Property {
+  casa
+  sobrado
+  apartamento
+  comercial
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String     @db.VarChar(255)
+  phone     String     @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  active    Boolean    @default(true)
+  type      Type_user  @default(client)
+  schedules Schedule[]
+
+  @@map("users")
+}
+
+model Address {
+  id          String    @id @default(uuid())
+  cep         String    @db.VarChar(100)
+  state       String    @db.VarChar(100)
+  city        String    @db.VarChar(255)
+  street      String    @db.VarChar(255)
+  number      String?   @db.VarChar(100)
+  complement  String    @db.VarChar(255)
+  property    Property? @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  property_id String?   @unique
+
+  @@map("adresses")
+}
+
+model Property {
+  id        String            @id @default(uuid())
+  name      String            @db.VarChar(255)
+  size      Int
+  available Boolean           @default(true)
+  category  Category_Property @default(casa)
+  schedules Schedule[]
+  address   Address?
+
+  @@map("properties")
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  date        DateTime @db.Date
+  hour        DateTime @db.Time()
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id     String
+  property    Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  property_id String
+
+  @@map("schedules")
+}
