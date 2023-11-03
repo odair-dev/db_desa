@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from '../dto/create-user.dto';
-// import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
 import { plainToInstance } from 'class-transformer';
 
@@ -16,19 +20,86 @@ export class UsersRepository {
     return plainToInstance(UserEntity, newUser);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(type: string): Promise<UserEntity[]> {
+    const allUsers = await this.prisma.user.findMany();
+    if (type == 'admin') {
+      return plainToInstance(UserEntity, allUsers);
+    } else {
+      throw new UnauthorizedException('Only admin can perform this operation');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(
+    id: string,
+    token_id: string,
+    type: string,
+  ): Promise<UserEntity> {
+    const uniqueUser = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!uniqueUser) {
+      throw new NotFoundException('User not found');
+    }
+    if (id == token_id || type == 'admin') {
+      return plainToInstance(UserEntity, uniqueUser);
+    } else {
+      throw new UnauthorizedException(
+        'Only owner or admin can perform this operation',
+      );
+    }
   }
 
-  //   update(id: number, updateUserDto: UpdateUserDto) {
-  //     return `This action updates a #${id} user`;
-  //   }
+  async update(
+    id: string,
+    token_id: string,
+    type: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const uniqueUser = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!uniqueUser) {
+      throw new NotFoundException('User not found');
+    }
+    if (id == token_id || type == 'admin') {
+      const user = this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: updateUserDto,
+      });
+      return plainToInstance(UserEntity, user);
+    } else {
+      throw new UnauthorizedException(
+        'Only owner or admin can perform this operation',
+      );
+    }
+  }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string, token_id: string, type: string) {
+    const findUser = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!findUser) {
+      throw new NotFoundException('User not found');
+    }
+    if (id == token_id || type == 'admin') {
+      const user = this.prisma.user.delete({
+        where: {
+          id,
+        },
+      });
+      return plainToInstance(UserEntity, user);
+    } else {
+      throw new UnauthorizedException(
+        'Only owner or admin can perform this operation',
+      );
+    }
   }
 }
