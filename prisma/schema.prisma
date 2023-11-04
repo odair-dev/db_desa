@@ -66,6 +66,7 @@ model Schedule {
   id          String   @id @default(uuid())
   date        DateTime @db.Date
   hour        DateTime @db.Time()
+  observation String?  @db.Text
   user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id     String
   property    Property @relation(fields: [property_id], references: [id], onDelete: Cascade)

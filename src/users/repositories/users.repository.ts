@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -14,6 +15,15 @@ export class UsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const existingEmail = await this.prisma.user.findUnique({
+      where: {
+        email: createUserDto.email,
+      },
+    });
+    if (existingEmail) {
+      console.log(existingEmail);
+      throw new ConflictException('This email already exists');
+    }
     const newUser = await this.prisma.user.create({
       data: createUserDto,
     });
@@ -29,6 +39,19 @@ export class UsersRepository {
     }
   }
 
+  async findAllActive(type: string): Promise<UserEntity[]> {
+    const allUsers = await this.prisma.user.findMany({
+      where: {
+        active: true,
+      },
+    });
+    if (type == 'admin') {
+      return plainToInstance(UserEntity, allUsers);
+    } else {
+      throw new UnauthorizedException('Only admin can perform this operation');
+    }
+  }
+
   async findOne(
     id: string,
     token_id: string,
@@ -36,7 +59,8 @@ export class UsersRepository {
   ): Promise<UserEntity> {
     const uniqueUser = await this.prisma.user.findUnique({
       where: {
-        id: id,
+        id,
+        active: true,
       },
     });
     if (!uniqueUser) {
@@ -59,7 +83,7 @@ export class UsersRepository {
   ): Promise<UserEntity> {
     const uniqueUser = await this.prisma.user.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
     if (!uniqueUser) {
@@ -83,17 +107,18 @@ export class UsersRepository {
   async remove(id: string, token_id: string, type: string) {
     const findUser = await this.prisma.user.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
     if (!findUser) {
       throw new NotFoundException('User not found');
     }
     if (id == token_id || type == 'admin') {
-      const user = this.prisma.user.delete({
+      const user = this.prisma.user.update({
         where: {
           id,
         },
+        data: { active: false },
       });
       return plainToInstance(UserEntity, user);
     } else {
