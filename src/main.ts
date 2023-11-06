@@ -8,7 +8,10 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+    }),
+    new ValidationPipe({
       transform: true,
+      transformOptions: { groups: ['transform'] },
     }),
   );
   await app.listen(process.env.PORT || 3000);

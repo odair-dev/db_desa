@@ -1,4 +1,6 @@
 import { $Enums, Type_user } from '@prisma/client';
+import { hashSync } from 'bcryptjs';
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEmail,
@@ -23,6 +25,9 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
+  @Transform(({ value }: { value: string }) => hashSync(value, 10), {
+    groups: ['transform'],
+  })
   password: string;
 
   @IsBoolean()
