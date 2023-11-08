@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreatePropertyDto } from '../dto/create-property.dto';
+import { CreatePropertyAndAddressDto } from '../dto/create-property.dto';
 import { UpdatePropertyDto } from '../dto/update-property.dto';
 import { PropertyEntity } from '../entities/property.entity';
 
@@ -14,11 +14,24 @@ export class PropertiesRepository {
 
   async create(
     type: string,
-    createPropertyDto: CreatePropertyDto,
+    createPropertyDto: CreatePropertyAndAddressDto,
   ): Promise<PropertyEntity> {
     if (type == 'admin') {
-      return this.prisma.property.create({
-        data: createPropertyDto,
+      const { address, ...rest } = createPropertyDto;
+      const newProperty = await this.prisma.property.create({
+        data: rest,
+      });
+      const newAddress = { ...address, property_id: newProperty.id };
+      await this.prisma.address.create({
+        data: newAddress,
+      });
+      return this.prisma.property.findUnique({
+        where: {
+          id: newProperty.id,
+        },
+        include: {
+          address: true,
+        },
       });
     } else {
       throw new UnauthorizedException('Only admin can perform this operation');
@@ -26,13 +39,20 @@ export class PropertiesRepository {
   }
 
   async findAll(): Promise<PropertyEntity[]> {
-    return this.prisma.property.findMany();
+    return this.prisma.property.findMany({
+      include: {
+        address: true,
+      },
+    });
   }
 
   async findOne(id: string): Promise<PropertyEntity> {
     const propertyFound = await this.prisma.property.findUnique({
       where: {
         id,
+      },
+      include: {
+        address: true,
       },
     });
     if (propertyFound) {
@@ -58,6 +78,9 @@ export class PropertiesRepository {
           where: {
             id,
           },
+          include: {
+            address: true,
+          },
           data: updatePropertyDto,
         });
       } else {
@@ -78,7 +101,7 @@ export class PropertiesRepository {
     });
     if (propertyFound) {
       if (type == 'admin') {
-        this.prisma.property.delete({
+        await this.prisma.property.delete({
           where: {
             id,
           },

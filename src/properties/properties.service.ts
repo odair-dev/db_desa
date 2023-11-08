@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePropertyDto } from './dto/create-property.dto';
+import { CreatePropertyAndAddressDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { PropertiesRepository } from './repositories/properties.repository';
 
@@ -7,7 +7,7 @@ import { PropertiesRepository } from './repositories/properties.repository';
 export class PropertiesService {
   constructor(private readonly repository: PropertiesRepository) {}
 
-  create(type: string, createPropertyDto: CreatePropertyDto) {
+  create(type: string, createPropertyDto: CreatePropertyAndAddressDto) {
     return this.repository.create(type, createPropertyDto);
   }
 

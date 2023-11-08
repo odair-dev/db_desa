@@ -108,6 +108,7 @@ export class UsersRepository {
     const findUser = await this.prisma.user.findUnique({
       where: {
         id,
+        active: true,
       },
     });
     if (!findUser) {

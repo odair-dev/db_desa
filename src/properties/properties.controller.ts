@@ -10,7 +10,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { PropertiesService } from './properties.service';
-import { CreatePropertyDto } from './dto/create-property.dto';
+import { CreatePropertyAndAddressDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -20,7 +20,10 @@ export class PropertiesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPropertyDto: CreatePropertyDto, @Request() req) {
+  create(
+    @Body() createPropertyDto: CreatePropertyAndAddressDto,
+    @Request() req,
+  ) {
     return this.propertiesService.create(req.user.type, createPropertyDto);
   }
 
