@@ -41,9 +41,10 @@ model Address {
   cep         String    @db.VarChar(100)
   state       String    @db.VarChar(100)
   city        String    @db.VarChar(255)
+  district    String    @db.VarChar(255)
   street      String    @db.VarChar(255)
   number      String?   @db.VarChar(100)
-  complement  String    @db.VarChar(255)
+  complement  String?   @db.VarChar(255)
   property    Property? @relation(fields: [property_id], references: [id], onDelete: Cascade)
   property_id String?   @unique
 
@@ -65,7 +66,7 @@ model Property {
 model Schedule {
   id          String   @id @default(uuid())
   date        DateTime @db.Date
-  hour        DateTime @db.Time()
+  hour        String
   observation String?  @db.Text
   user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id     String

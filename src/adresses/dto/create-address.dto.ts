@@ -15,6 +15,10 @@ export class CreateAddressDto {
 
   @IsString()
   @IsNotEmpty()
+  district: string;
+
+  @IsString()
+  @IsNotEmpty()
   street: string;
 
   @IsString()
@@ -22,7 +26,7 @@ export class CreateAddressDto {
   number: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   complement: string;
 
   @IsString()

@@ -5,6 +5,7 @@ export class AddressEntity implements Address {
   cep: string;
   state: string;
   city: string;
+  district: string;
   street: string;
   number: string;
   complement: string;
