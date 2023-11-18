@@ -31,4 +31,14 @@ export class UsersService {
   remove(id: string, token_id: string, type: string) {
     return this.repository.remove(id, token_id, type);
   }
+
+  async sendEmailSchedule(email: string, name: string, text: string) {
+    const receiptScheduleTemplate = this.repository.receiptScheduleTemplate(
+      email,
+      name,
+      text,
+    );
+
+    await this.repository.sendMail(receiptScheduleTemplate);
+  }
 }

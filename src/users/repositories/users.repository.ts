@@ -9,10 +9,24 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
 import { plainToInstance } from 'class-transformer';
+import * as Mailgen from 'mailgen';
+import { MailerService } from '@nestjs-modules/mailer';
+import { SendEmailDto } from '../dto/send-mail.dto';
+
+const mailGenerator = new Mailgen({
+  theme: 'default',
+  product: {
+    name: 'de Sá Incorporações',
+    link: 'http://localhost:3001/',
+  },
+});
 
 @Injectable()
 export class UsersRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailerService: MailerService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const existingEmail = await this.prisma.user.findUnique({
@@ -127,5 +141,43 @@ export class UsersRepository {
         'Only owner or admin can perform this operation',
       );
     }
+  }
+
+  async sendMail({ to, subject, text }: SendEmailDto) {
+    await this.mailerService
+      .sendMail({
+        to,
+        subject,
+        html: text,
+      })
+      .then(() => {
+        return true;
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
+  }
+
+  receiptScheduleTemplate(userEmail: string, userName: string, text: string) {
+    const email = {
+      body: {
+        greeting: 'Olá',
+        name: userName,
+        intro: `Seu agendamento foi realizado com sucesso para ${text}.`,
+        outro: 'DeSá Incorporações. Projetando sonhos, construindo o futuro.',
+        signature: 'Atenciosamente',
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: userEmail,
+      subject: 'Agendamento de visita',
+      text: emailBody,
+    };
+
+    return emailTemplate;
   }
 }

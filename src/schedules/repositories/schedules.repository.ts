@@ -9,10 +9,14 @@ import { CreateScheduleDto } from '../dto/create-schedule.dto';
 import { UpdateScheduleDto } from '../dto/update-schedule.dto';
 import { ScheduleEntity } from '../entities/schedule.entity';
 import { plainToInstance } from 'class-transformer';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class SchedulesRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
   async create(
     token_id: string,
@@ -57,6 +61,7 @@ export class SchedulesRepository {
                 id: true,
                 name: true,
                 phone: true,
+                email: true,
                 type: true,
                 active: true,
               },
@@ -75,6 +80,14 @@ export class SchedulesRepository {
             },
           },
         });
+        const dataFormated = newRegisterSchedule.date;
+        dataFormated.setDate(dataFormated.getDate() + 1);
+        await this.usersService.sendEmailSchedule(
+          newRegisterSchedule.user.email,
+          newRegisterSchedule.user.name,
+          `o dia ${newRegisterSchedule.date.toLocaleDateString()} 
+          às ${newRegisterSchedule.hour}`,
+        );
         return plainToInstance(ScheduleEntity, newRegisterSchedule);
       }
     } else {
@@ -84,13 +97,94 @@ export class SchedulesRepository {
 
   async findAll(user_id: string, type: string) {
     if (type == 'admin') {
-      return this.prisma.schedule.findMany();
+      const allSchedules = await this.prisma.schedule.findMany({
+        include: {
+          property: true,
+          user: {
+            select: {
+              name: true,
+              phone: true,
+              email: true,
+            },
+          },
+        },
+      });
+      const returnSchedule = [];
+      allSchedules.map((schedule) => {
+        const dataFormated = schedule.date;
+        dataFormated.setDate(dataFormated.getDate() + 1);
+        if (
+          Date.parse(schedule.date.toString().slice(0, 15)) >=
+          Date.parse(new Date().toString().slice(0, 15))
+        ) {
+          // console.log('Data do banco maior ou igual a data atual');
+          returnSchedule.push(schedule);
+        }
+      });
+
+      function compare(a, b) {
+        if (a.date < b.date) {
+          return -1;
+        }
+        if (a.date > b.date) {
+          return 1;
+        }
+        if (a.hour < b.hour) {
+          return -1;
+        }
+        if (a.hour > b.hour) {
+          return 1;
+        }
+        return 0;
+      }
+
+      return returnSchedule.sort(compare);
     } else {
-      return this.prisma.schedule.findMany({
+      const allSchedules = await this.prisma.schedule.findMany({
         where: {
           user_id,
         },
+        include: {
+          property: true,
+          user: {
+            select: {
+              name: true,
+              phone: true,
+              email: true,
+            },
+          },
+        },
       });
+      const returnSchedule = [];
+      allSchedules.map((schedule) => {
+        const dataFormated = schedule.date;
+        dataFormated.setDate(dataFormated.getDate() + 1);
+        if (
+          Date.parse(schedule.date.toString().slice(0, 15)) >=
+          Date.parse(new Date().toString().slice(0, 15))
+        ) {
+          // console.log('Data do banco maior ou igual a data atual');
+          returnSchedule.push(schedule);
+        }
+      });
+
+      function compare(a, b) {
+        if (a.date < b.date) {
+          return -1;
+        }
+        if (a.date > b.date) {
+          return 1;
+        }
+        if (a.hour < b.hour) {
+          return -1;
+        }
+        if (a.hour > b.hour) {
+          return 1;
+        }
+        return 0;
+      }
+
+      return returnSchedule.sort(compare);
     }
   }
 
