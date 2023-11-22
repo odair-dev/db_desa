@@ -9,7 +9,14 @@ import { AdressesModule } from './adresses/adresses.module';
 import { SchedulesModule } from './schedules/schedules.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, PropertiesModule, AdressesModule, SchedulesModule],
+  imports: [
+    ConfigModule.forRoot(),
+    UsersModule,
+    AuthModule,
+    PropertiesModule,
+    AdressesModule,
+    SchedulesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

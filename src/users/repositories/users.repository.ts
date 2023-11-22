@@ -180,4 +180,72 @@ export class UsersRepository {
 
     return emailTemplate;
   }
+
+  receiptNewScheduleTemplate(
+    userEmail: string,
+    userName: string,
+    text: string,
+  ) {
+    const email = {
+      body: {
+        greeting: userName,
+        intro: `Um novo agendamento foi realizado para ${text}.`,
+        signature: 'Atenciosamente',
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: userEmail,
+      subject: 'Agendamento de visita',
+      text: emailBody,
+    };
+
+    return emailTemplate;
+  }
+
+  receiptScheduleRemoveTemplate(
+    userEmail: string,
+    userName: string,
+    text: string,
+  ) {
+    const email = {
+      body: {
+        greeting: userName,
+        intro: `Cancelou a visita ${text}.`,
+        signature: 'Atenciosamente',
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: userEmail,
+      subject: 'Cancelamento de visita',
+      text: emailBody,
+    };
+
+    return emailTemplate;
+  }
+
+  contactEmailTemplate(userEmail: string, userName: string, text: string) {
+    const email = {
+      body: {
+        greeting: userName,
+        intro: text,
+        signature: userEmail,
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: 'odairodriguez@yahoo.com.br',
+      subject: 'Contato via site',
+      text: emailBody,
+    };
+
+    return emailTemplate;
+  }
 }

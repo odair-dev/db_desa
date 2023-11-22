@@ -10,7 +10,11 @@ import {
   Request,
 } from '@nestjs/common';
 import { SchedulesService } from './schedules.service';
-import { CreateScheduleDto, FindScheduleDto } from './dto/create-schedule.dto';
+import {
+  ContactEmailDto,
+  CreateScheduleDto,
+  FindScheduleDto,
+} from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -26,6 +30,11 @@ export class SchedulesController {
     @Request() req,
   ) {
     return this.schedulesService.create(req.user.id, id, createScheduleDto);
+  }
+
+  @Post('contato')
+  contact(@Body() contactEmailDto: ContactEmailDto) {
+    return this.schedulesService.contact(contactEmailDto);
   }
 
   @Get()

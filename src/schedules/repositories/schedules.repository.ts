@@ -5,17 +5,21 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateScheduleDto } from '../dto/create-schedule.dto';
+import { ContactEmailDto, CreateScheduleDto } from '../dto/create-schedule.dto';
 import { UpdateScheduleDto } from '../dto/update-schedule.dto';
 import { ScheduleEntity } from '../entities/schedule.entity';
 import { plainToInstance } from 'class-transformer';
 import { UsersService } from 'src/users/users.service';
+import { TRANSCODE_QUEUE } from 'src/constants';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class SchedulesRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly usersService: UsersService,
+    @InjectQueue(TRANSCODE_QUEUE) private readonly transcodeQueue: Queue,
   ) {}
 
   async create(
@@ -82,12 +86,13 @@ export class SchedulesRepository {
         });
         const dataFormated = newRegisterSchedule.date;
         dataFormated.setDate(dataFormated.getDate() + 1);
-        await this.usersService.sendEmailSchedule(
-          newRegisterSchedule.user.email,
-          newRegisterSchedule.user.name,
-          `o dia ${newRegisterSchedule.date.toLocaleDateString()} 
-          às ${newRegisterSchedule.hour}`,
-        );
+
+        await this.transcodeQueue.add({
+          ...newRegisterSchedule,
+          new: true,
+          contact: false,
+        });
+
         return plainToInstance(ScheduleEntity, newRegisterSchedule);
       }
     } else {
@@ -163,7 +168,6 @@ export class SchedulesRepository {
           Date.parse(schedule.date.toString().slice(0, 15)) >=
           Date.parse(new Date().toString().slice(0, 15))
         ) {
-          // console.log('Data do banco maior ou igual a data atual');
           returnSchedule.push(schedule);
         }
       });
@@ -202,14 +206,19 @@ export class SchedulesRepository {
     }
   }
 
-  async findOne(
-    id: string,
-    user_id: string,
-    type: string,
-  ): Promise<ScheduleEntity> {
+  async findOne(id: string, user_id: string, type: string) {
     const foundSchedule = await this.prisma.schedule.findUnique({
       where: {
         id,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            phone: true,
+            email: true,
+          },
+        },
       },
     });
     if (foundSchedule) {
@@ -259,6 +268,15 @@ export class SchedulesRepository {
       where: {
         id,
       },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+            phone: true,
+          },
+        },
+      },
     });
     if (foundSchedule) {
       if (type == 'admin' || foundSchedule.user_id == user_id) {
@@ -266,6 +284,11 @@ export class SchedulesRepository {
           where: {
             id,
           },
+        });
+        await this.transcodeQueue.add({
+          ...foundSchedule,
+          new: false,
+          contact: false,
         });
       } else {
         throw new UnauthorizedException(
@@ -275,5 +298,15 @@ export class SchedulesRepository {
     } else {
       throw new NotFoundException('Schedule not found');
     }
+  }
+
+  async contact(contactEmailDto: ContactEmailDto) {
+    await this.transcodeQueue.add({
+      user: { ...contactEmailDto },
+      new: false,
+      contact: true,
+    });
+
+    return true;
   }
 }

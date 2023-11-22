@@ -13,6 +13,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+// import { ContactEmailDto } from './dto/send-mail.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,6 +23,11 @@ export class UsersController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
+
+  // @Post('contato')
+  // contact(@Body() contactEmailDto: ContactEmailDto) {
+  //   return this.usersService.contact(contactEmailDto);
+  // }
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -55,4 +61,8 @@ export class UsersController {
   remove(@Param('id') id: string, @Request() req) {
     return this.usersService.remove(id, req.user.id, req.user.type);
   }
+
+  // sendEmailSchedule() {
+  //   return true;
+  // }
 }

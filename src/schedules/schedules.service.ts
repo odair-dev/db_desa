@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateScheduleDto } from './dto/create-schedule.dto';
+import { ContactEmailDto, CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { SchedulesRepository } from './repositories/schedules.repository';
 
@@ -38,5 +38,9 @@ export class SchedulesService {
 
   remove(id: string, user_id: string, type: string) {
     return this.repository.remove(id, user_id, type);
+  }
+
+  async contact(contactEmailDto: ContactEmailDto) {
+    return this.repository.contact(contactEmailDto);
   }
 }

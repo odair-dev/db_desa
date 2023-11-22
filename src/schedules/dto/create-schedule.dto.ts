@@ -41,3 +41,14 @@ export class FindScheduleDto {
   @IsNotEmpty()
   schedule: string;
 }
+
+export class ContactEmailDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  email: string;
+
+  @IsString()
+  text: string;
+}
