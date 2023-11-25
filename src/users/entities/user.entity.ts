@@ -11,5 +11,6 @@ export class UserEntity implements User {
   password: string;
 
   active: boolean;
+  reset: string | null;
   type: $Enums.Type_user;
 }

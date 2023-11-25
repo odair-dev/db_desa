@@ -4,21 +4,15 @@ import { UsersController } from './users.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersRepository } from './repositories/users.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
-// import { TranscodeConsumer } from 'src/transcode.consumer';
-// import { BullModule } from '@nestjs/bull';
-// import { TRANSCODE_QUEUE } from 'src/constants';
+import { RESET_QUEUE } from 'src/constants';
+import { BullModule } from '@nestjs/bull';
+import { ResetConsumer } from 'src/reset.consumer';
 
 @Module({
   imports: [
-    // BullModule.forRoot({
-    //   redis: {
-    //     host: 'localhost',
-    //     port: 6379,
-    //   },
-    // }),
-    // BullModule.registerQueue({
-    //   name: TRANSCODE_QUEUE,
-    // }),
+    BullModule.registerQueue({
+      name: RESET_QUEUE,
+    }),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
@@ -33,6 +27,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, PrismaService, UsersRepository],
+  providers: [UsersService, PrismaService, UsersRepository, ResetConsumer],
 })
 export class UsersModule {}

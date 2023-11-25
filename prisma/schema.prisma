@@ -30,6 +30,7 @@ model User {
   phone     String     @db.VarChar(255)
   password  String     @db.VarChar(255)
   active    Boolean    @default(true)
+  reset     String?
   type      Type_user  @default(client)
   schedules Schedule[]
 

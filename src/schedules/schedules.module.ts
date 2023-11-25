@@ -3,11 +3,11 @@ import { SchedulesService } from './schedules.service';
 import { SchedulesController } from './schedules.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SchedulesRepository } from './repositories/schedules.repository';
-import { UsersService } from 'src/users/users.service';
-import { UsersRepository } from 'src/users/repositories/users.repository';
 import { TranscodeConsumer } from 'src/transcode.consumer';
 import { BullModule } from '@nestjs/bull';
 import { TRANSCODE_QUEUE } from 'src/constants';
+// import { UsersService } from 'src/users/users.service';
+// import { UsersRepository } from 'src/users/repositories/users.repository';
 
 @Module({
   imports: [
@@ -26,9 +26,10 @@ import { TRANSCODE_QUEUE } from 'src/constants';
     SchedulesService,
     PrismaService,
     SchedulesRepository,
-    UsersService,
-    UsersRepository,
     TranscodeConsumer,
+    // UsersService,
+    // UsersRepository,
   ],
+  // exports: [BullModule],
 })
 export class SchedulesModule {}

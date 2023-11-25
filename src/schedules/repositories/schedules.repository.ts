@@ -9,17 +9,27 @@ import { ContactEmailDto, CreateScheduleDto } from '../dto/create-schedule.dto';
 import { UpdateScheduleDto } from '../dto/update-schedule.dto';
 import { ScheduleEntity } from '../entities/schedule.entity';
 import { plainToInstance } from 'class-transformer';
-import { UsersService } from 'src/users/users.service';
 import { TRANSCODE_QUEUE } from 'src/constants';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import * as Mailgen from 'mailgen';
+import { MailerService } from '@nestjs-modules/mailer';
+import { SendEmailDto } from '../dto/send-mail.dto';
+
+const mailGenerator = new Mailgen({
+  theme: 'default',
+  product: {
+    name: 'de Sá Incorporações',
+    link: 'http://localhost:3001/',
+  },
+});
 
 @Injectable()
 export class SchedulesRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly usersService: UsersService,
     @InjectQueue(TRANSCODE_QUEUE) private readonly transcodeQueue: Queue,
+    private readonly mailerService: MailerService,
   ) {}
 
   async create(
@@ -289,6 +299,7 @@ export class SchedulesRepository {
           ...foundSchedule,
           new: false,
           contact: false,
+          reset: false,
         });
       } else {
         throw new UnauthorizedException(
@@ -308,5 +319,111 @@ export class SchedulesRepository {
     });
 
     return true;
+  }
+
+  receiptScheduleTemplate(userEmail: string, userName: string, text: string) {
+    const email = {
+      body: {
+        greeting: 'Olá',
+        name: userName,
+        intro: `Seu agendamento foi realizado com sucesso para ${text}.`,
+        outro: 'DeSá Incorporações. Projetando sonhos, construindo o futuro.',
+        signature: 'Atenciosamente',
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: userEmail,
+      subject: 'Agendamento de visita',
+      text: emailBody,
+    };
+
+    return emailTemplate;
+  }
+
+  async sendMail({ to, subject, text }: SendEmailDto) {
+    await this.mailerService
+      .sendMail({
+        to,
+        subject,
+        html: text,
+      })
+      .then(() => {
+        return true;
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
+  }
+
+  receiptNewScheduleTemplate(
+    userEmail: string,
+    userName: string,
+    text: string,
+  ) {
+    const email = {
+      body: {
+        greeting: userName,
+        intro: `Um novo agendamento foi realizado para ${text}.`,
+        signature: 'Atenciosamente',
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: userEmail,
+      subject: 'Agendamento de visita',
+      text: emailBody,
+    };
+
+    return emailTemplate;
+  }
+
+  receiptScheduleRemoveTemplate(
+    userEmail: string,
+    userName: string,
+    text: string,
+  ) {
+    const email = {
+      body: {
+        greeting: userName,
+        intro: `Cancelou a visita ${text}.`,
+        signature: 'Atenciosamente',
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: userEmail,
+      subject: 'Cancelamento de visita',
+      text: emailBody,
+    };
+
+    return emailTemplate;
+  }
+
+  contactEmailTemplate(userEmail: string, userName: string, text: string) {
+    const email = {
+      body: {
+        greeting: userName,
+        intro: text,
+        signature: userEmail,
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    const emailTemplate = {
+      to: 'odairodriguez@yahoo.com.br',
+      subject: 'Contato via site',
+      text: emailBody,
+    };
+
+    return emailTemplate;
   }
 }

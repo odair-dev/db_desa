@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  HttpCode,
 } from '@nestjs/common';
 import { SchedulesService } from './schedules.service';
 import {
@@ -32,10 +33,17 @@ export class SchedulesController {
     return this.schedulesService.create(req.user.id, id, createScheduleDto);
   }
 
+  @HttpCode(200)
   @Post('contato')
   contact(@Body() contactEmailDto: ContactEmailDto) {
     return this.schedulesService.contact(contactEmailDto);
   }
+
+  // @HttpCode(200)
+  // @Post('reset')
+  // resetAccount(@Body() email: string) {
+  //   return this.schedulesService.sendEmailResetAccount(email);
+  // }
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -49,6 +57,7 @@ export class SchedulesController {
     return this.schedulesService.findOne(id, req.user.id, req.user.type);
   }
 
+  @HttpCode(200)
   @Post('free/schedules')
   findFreeSchedule(@Body() findScheduleDto: FindScheduleDto) {
     return this.schedulesService.findFreeSchedule(

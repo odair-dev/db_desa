@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   ConflictException,
+  // RequestTimeoutException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -12,6 +13,10 @@ import { plainToInstance } from 'class-transformer';
 import * as Mailgen from 'mailgen';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SendEmailDto } from '../dto/send-mail.dto';
+import { randomUUID } from 'crypto';
+import { InjectQueue } from '@nestjs/bull';
+import { RESET_QUEUE } from 'src/constants';
+import { Queue } from 'bull';
 
 const mailGenerator = new Mailgen({
   theme: 'default',
@@ -26,6 +31,7 @@ export class UsersRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailerService: MailerService,
+    @InjectQueue(RESET_QUEUE) private readonly resetQueue: Queue,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
@@ -87,6 +93,42 @@ export class UsersRepository {
         'Only owner or admin can perform this operation',
       );
     }
+  }
+
+  async findByTokenReset(token_reset: string): Promise<UserEntity> {
+    const uniqueUser = await this.prisma.user.findFirst({
+      where: {
+        reset: token_reset,
+      },
+    });
+    if (!uniqueUser) {
+      throw new NotFoundException('User not found');
+    }
+    return plainToInstance(UserEntity, uniqueUser);
+  }
+
+  async updateByTokenReset(
+    token_reset: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const uniqueUser = await this.prisma.user.findFirst({
+      where: {
+        reset: token_reset,
+      },
+    });
+    if (!uniqueUser) {
+      throw new UnauthorizedException('unauthorized operation');
+    }
+    const user = await this.prisma.user.update({
+      where: {
+        id: uniqueUser.id,
+      },
+      data: {
+        ...updateUserDto,
+        reset: null,
+      },
+    });
+    return plainToInstance(UserEntity, user);
   }
 
   async update(
@@ -159,14 +201,28 @@ export class UsersRepository {
       });
   }
 
-  receiptScheduleTemplate(userEmail: string, userName: string, text: string) {
+  resetPasswordTemplate(
+    userEmail: string,
+    userName: string,
+    resetToken: string,
+  ) {
     const email = {
       body: {
-        greeting: 'Olá',
+        greeting: 'Olá,',
         name: userName,
-        intro: `Seu agendamento foi realizado com sucesso para ${text}.`,
-        outro: 'DeSá Incorporações. Projetando sonhos, construindo o futuro.',
         signature: 'Atenciosamente',
+        intro:
+          'Você recebeu este e-mail porque foi recebida uma solicitação de redefinição de senha da sua conta.',
+        action: {
+          instructions: 'Clique no botão abaixo para redefinir sua senha:',
+          button: {
+            color: '#DC4D2F',
+            text: 'Redefinir sua senha',
+            link: `https://localhost:3001/user/reset/${resetToken}`,
+          },
+          outro:
+            'Se você não solicitou uma redefinição de senha, nenhuma ação adicional será necessária de sua parte.',
+        },
       },
     };
 
@@ -174,78 +230,41 @@ export class UsersRepository {
 
     const emailTemplate = {
       to: userEmail,
-      subject: 'Agendamento de visita',
+      subject: 'Redefinição de senha',
       text: emailBody,
     };
 
     return emailTemplate;
   }
 
-  receiptNewScheduleTemplate(
-    userEmail: string,
-    userName: string,
-    text: string,
-  ) {
-    const email = {
-      body: {
-        greeting: userName,
-        intro: `Um novo agendamento foi realizado para ${text}.`,
-        signature: 'Atenciosamente',
+  async resetPassword(email: string) {
+    const uniqueUser = await this.prisma.user.findUnique({
+      where: {
+        email,
       },
-    };
+    });
+    if (!uniqueUser) {
+      throw new NotFoundException('Account not found');
+    } else {
+      const resetToken = randomUUID();
+      await this.prisma.user.update({
+        where: {
+          id: uniqueUser.id,
+        },
+        data: {
+          reset: resetToken,
+          active: true,
+        },
+      });
 
-    const emailBody = mailGenerator.generate(email);
+      await this.resetQueue.add({
+        user: { ...uniqueUser, reset: resetToken },
+        new: false,
+        contact: false,
+        reset: true,
+      });
 
-    const emailTemplate = {
-      to: userEmail,
-      subject: 'Agendamento de visita',
-      text: emailBody,
-    };
-
-    return emailTemplate;
-  }
-
-  receiptScheduleRemoveTemplate(
-    userEmail: string,
-    userName: string,
-    text: string,
-  ) {
-    const email = {
-      body: {
-        greeting: userName,
-        intro: `Cancelou a visita ${text}.`,
-        signature: 'Atenciosamente',
-      },
-    };
-
-    const emailBody = mailGenerator.generate(email);
-
-    const emailTemplate = {
-      to: userEmail,
-      subject: 'Cancelamento de visita',
-      text: emailBody,
-    };
-
-    return emailTemplate;
-  }
-
-  contactEmailTemplate(userEmail: string, userName: string, text: string) {
-    const email = {
-      body: {
-        greeting: userName,
-        intro: text,
-        signature: userEmail,
-      },
-    };
-
-    const emailBody = mailGenerator.generate(email);
-
-    const emailTemplate = {
-      to: 'odairodriguez@yahoo.com.br',
-      subject: 'Contato via site',
-      text: emailBody,
-    };
-
-    return emailTemplate;
+      return true;
+    }
   }
 }

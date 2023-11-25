@@ -43,4 +43,45 @@ export class SchedulesService {
   async contact(contactEmailDto: ContactEmailDto) {
     return this.repository.contact(contactEmailDto);
   }
+
+  // sendEmailResetAccount(email: string) {
+  //   return this.repository.sendEmailResetPassword(email);
+  // }
+
+  async sendEmailSchedule(email: string, name: string, text: string) {
+    const receiptScheduleTemplate = this.repository.receiptScheduleTemplate(
+      email,
+      name,
+      text,
+    );
+
+    await this.repository.sendMail(receiptScheduleTemplate);
+  }
+
+  async sendEmailNewSchedule(email: string, name: string, text: string) {
+    const receiptScheduleTemplate = this.repository.receiptNewScheduleTemplate(
+      email,
+      name,
+      text,
+    );
+
+    await this.repository.sendMail(receiptScheduleTemplate);
+  }
+
+  async sendEmailRemoveSchedule(email: string, name: string, text: string) {
+    const receiptScheduleTemplate =
+      this.repository.receiptScheduleRemoveTemplate(email, name, text);
+
+    await this.repository.sendMail(receiptScheduleTemplate);
+  }
+
+  async contactEmail(email: string, name: string, text: string) {
+    const contactEmailTemplate = this.repository.contactEmailTemplate(
+      email,
+      name,
+      text,
+    );
+
+    await this.repository.sendMail(contactEmailTemplate);
+  }
 }

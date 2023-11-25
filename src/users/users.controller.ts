@@ -8,12 +8,12 @@ import {
   Delete,
   UseGuards,
   Request,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-// import { ContactEmailDto } from './dto/send-mail.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,10 +24,11 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  // @Post('contato')
-  // contact(@Body() contactEmailDto: ContactEmailDto) {
-  //   return this.usersService.contact(contactEmailDto);
-  // }
+  @HttpCode(200)
+  @Post('reset')
+  reset(@Body('email') email: string) {
+    return this.usersService.requestResetPassword(email);
+  }
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -39,6 +40,16 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string, @Request() req) {
     return this.usersService.findOne(id, req.user.id, req.user.type);
+  }
+
+  @Get('reset/:id')
+  findReset(@Param('id') id: string) {
+    return this.usersService.findByToken(id);
+  }
+
+  @Patch('reset/:id')
+  updateReset(@Body() updateUserDto: UpdateUserDto, @Param('id') id: string) {
+    return this.usersService.updateByToken(id, updateUserDto);
   }
 
   @Patch(':id')
@@ -61,8 +72,4 @@ export class UsersController {
   remove(@Param('id') id: string, @Request() req) {
     return this.usersService.remove(id, req.user.id, req.user.type);
   }
-
-  // sendEmailSchedule() {
-  //   return true;
-  // }
 }
