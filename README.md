@@ -1,38 +1,36 @@
+# de Sá Incorporações - API
+
+### API para o empresa de Sá, possibilita ao cliente visualizar os imóveis, criar, editar e excluir uma conta, recuperar a senha, gerenciar seus agendamentos de visitas e entrar em contato com a empresa por email, telefone e whatsApp.
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+ <a href="#pre">Pré-requisitos</a> |
+ <a href="#rodando">Instalação</a> | 
+ <a href="#tecnologias">Tecnologias</a> |  
+ <a href="#linkLocal">Link Local</a> |  
+ <a href="#autor">Autor</a> |
+ <a href="#licenca">Licença</a> 
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<h3 id="pre">Pré-requisitos para execução local</h3>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+Antes de começar, você vai precisar ter instalado em sua máquina as seguintes ferramentas:
+[Git](https://git-scm.com)
+[Node](https://nodejs.org/en)
+[VSCode](https://code.visualstudio.com/)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<h3 id="rodando">Instalação</h3>
 
-## Installation
+---
+
+Após clonar o projeto para o seu computador e abri-lo com o vscode, instale as dependencias.
 
 ```bash
-$ npm install
+  npm install
 ```
 
-## Running the app
+Agora para executar a aplicação utilize:
 
 ```bash
 # development
@@ -45,29 +43,39 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+<h3 id="linkLocal">Link local do APP</h3>
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+[http://localhost:3000](http://localhost:3000)
 
-# test coverage
-$ npm run test:cov
-```
+<h3 id="tecnologias">Tecnologias</h3>
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Nest
+- Prisma
+- Typescript
+- bcryptjs
+- passport-jwt
+- class-validator
+- class-transformer
+- redis
+- bullmq
+- nodemailer
+- mailgen
 
-## Stay in touch
+<h3 id="autor">Autor</h3>
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+Desenvolvido por Odair Sobrinho 🚀 Entre em contato!
 
-Nest is [MIT licensed](LICENSE).
+[![Linkedin Badge](https://img.shields.io/badge/-Odair-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/odair-sobrinho/)](https://www.linkedin.com/in/odair-sobrinho/)
+[![Gmail Badge](https://img.shields.io/badge/-odairodriguez@yahoo.com.br-slateblue?style=flat-square&logo=Yahoo&logoColor=white&link=mailto:odairodriguez@yahoo.com.br)](mailto:odairodriguez@yahoo.com.br)
+
+<h3 id="licenca">Licença</h3>
+
+---
+
+Este projeto está licenciado sob a licença MIT

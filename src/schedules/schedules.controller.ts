@@ -18,12 +18,15 @@ import {
 } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('schedules')
 @Controller('schedules')
 export class SchedulesController {
   constructor(private readonly schedulesService: SchedulesService) {}
 
   @Post('property/:id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   create(
     @Body() createScheduleDto: CreateScheduleDto,
@@ -39,19 +42,15 @@ export class SchedulesController {
     return this.schedulesService.contact(contactEmailDto);
   }
 
-  // @HttpCode(200)
-  // @Post('reset')
-  // resetAccount(@Body() email: string) {
-  //   return this.schedulesService.sendEmailResetAccount(email);
-  // }
-
   @Get()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   findAll(@Request() req) {
     return this.schedulesService.findAll(req.user.id, req.user.type);
   }
 
   @Get(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string, @Request() req) {
     return this.schedulesService.findOne(id, req.user.id, req.user.type);
@@ -67,6 +66,7 @@ export class SchedulesController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
@@ -82,6 +82,7 @@ export class SchedulesController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string, @Request() req) {
     return this.schedulesService.remove(id, req.user.id, req.user.type);

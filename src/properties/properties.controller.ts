@@ -13,13 +13,16 @@ import { PropertiesService } from './properties.service';
 import { CreatePropertyAndAddressDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('properties')
 @Controller('properties')
 export class PropertiesController {
   constructor(private readonly propertiesService: PropertiesService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   create(
     @Body() createPropertyDto: CreatePropertyAndAddressDto,
     @Request() req,
@@ -37,8 +40,9 @@ export class PropertiesController {
     return this.propertiesService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
     @Body() updatePropertyDto: UpdatePropertyDto,
@@ -47,8 +51,9 @@ export class PropertiesController {
     return this.propertiesService.update(id, req.user.type, updatePropertyDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string, @Request() req) {
     return this.propertiesService.remove(id, req.user.type);
   }
