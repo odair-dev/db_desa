@@ -6,7 +6,7 @@
  <a href="#pre">Pré-requisitos</a> |
  <a href="#rodando">Instalação</a> | 
  <a href="#tecnologias">Tecnologias</a> |  
- <a href="#linkLocal">Link Local</a> |  
+ <a href="#linkLocal">Link Documentação</a> |  
  <a href="#autor">Autor</a> |
  <a href="#licenca">Licença</a> 
 </p>
@@ -43,11 +43,11 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-<h3 id="linkLocal">Link local do APP</h3>
+<h3 id="linkLocal">Link Documentação</h3>
 
 ---
 
-[http://localhost:3000](http://localhost:3000)
+[http://localhost:3000/api](http://localhost:3000/api)
 
 <h3 id="tecnologias">Tecnologias</h3>
 
@@ -64,6 +64,7 @@ $ npm run start:prod
 - bullmq
 - nodemailer
 - mailgen
+- swagger
 
 <h3 id="autor">Autor</h3>
 
