@@ -202,11 +202,12 @@ export class SchedulesRepository {
     }
   }
 
-  async findFreeSchedule(hour: string, date: Date) {
+  async findFreeSchedule(hour: string, date: Date, id: string) {
     const findSchedule = await this.prisma.schedule.findFirst({
       where: {
         hour,
         date,
+        property_id: id,
       },
     });
     if (findSchedule) {

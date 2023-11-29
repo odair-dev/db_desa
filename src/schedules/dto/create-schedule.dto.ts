@@ -48,6 +48,11 @@ export class FindScheduleDto {
   @IsString()
   @IsNotEmpty()
   schedule: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  property_id: string;
 }
 
 export class ContactEmailDto {

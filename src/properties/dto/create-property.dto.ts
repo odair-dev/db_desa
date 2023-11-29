@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { $Enums, Category_Property } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -24,7 +25,7 @@ export class CreatePropertyDto {
   size: number;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   @IsOptional()
   available: boolean;
 
@@ -46,7 +47,7 @@ export class CreatePropertyAndAddressDto {
   size: number;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   @IsOptional()
   available: boolean;
 

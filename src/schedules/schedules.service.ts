@@ -23,8 +23,8 @@ export class SchedulesService {
     return this.repository.findOne(id, user_id, type);
   }
 
-  findFreeSchedule(schedules: string, date: Date) {
-    return this.repository.findFreeSchedule(schedules, date);
+  findFreeSchedule(schedules: string, date: Date, id: string) {
+    return this.repository.findFreeSchedule(schedules, date, id);
   }
 
   update(

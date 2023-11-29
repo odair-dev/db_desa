@@ -62,6 +62,7 @@ export class SchedulesController {
     return this.schedulesService.findFreeSchedule(
       findScheduleDto.schedule,
       findScheduleDto.date,
+      findScheduleDto.property_id,
     );
   }
 
