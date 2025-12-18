@@ -31,6 +31,43 @@ make up
 - 🗄️ **PostgreSQL**: localhost:5432
 - 🔴 **Redis**: localhost:6379
 
+### ✅ Status do Sistema
+
+O ambiente Docker está **totalmente funcional** e configurado com:
+
+- ✅ **PostgreSQL 15** - Banco principal com health check
+- ✅ **Redis 7** - Cache e filas com health check  
+- ✅ **NestJS** - API rodando na porta 3000
+- ✅ **Migrações** - Executadas automaticamente na inicialização
+- ✅ **Dados iniciais** - Carregados via seed na primeira execução
+- ✅ **Swagger** - Documentação disponível em `/api`
+
+### 🔄 Processo de Inicialização Automatizado
+
+1. 🔍 Verificação da conexão com banco de dados
+2. 🔄 Execução das migrações do Prisma
+3. 🌱 Carregamento dos dados iniciais (seed)
+4. 🚀 Inicialização da aplicação NestJS
+
+## 📊 Dados Iniciais
+
+O sistema é inicializado automaticamente com dados padrão para testes:
+
+### 👨‍💼 Usuário Administrador
+- **Email**: `admin@desaincorporacoes.com.br`
+- **Senha**: `admin123`
+- **Tipo**: Administrador
+- **Telefone**: (11) 99999-9999
+
+### 🏢 Propriedade de Exemplo
+- **Nome**: Residencial Lisboa
+- **Tipo**: Apartamento
+- **Tamanho**: 85m²
+- **Status**: Disponível
+- **Endereço**: Rua Lisboa, 123 - Vila Madalena, São Paulo/SP - CEP: 01234-567
+
+> 💡 **Dica**: Use as credenciais do administrador para acessar todas as funcionalidades da API via Swagger!
+
 ## 🛠️ Comandos Disponíveis
 
 ```bash
@@ -43,6 +80,7 @@ make reset       # Reset completo (remove dados)
 make shell       # Acessar shell da aplicação
 make db-shell    # Acessar PostgreSQL CLI
 make migrate     # Executar migrações manualmente
+make seed        # Executar seed (dados iniciais) manualmente
 ```
 
 ## 🏗️ Arquitetura

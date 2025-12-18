@@ -58,6 +58,9 @@ redis-shell: ## Acessar shell do Redis
 migrate: ## Executar migrações manualmente
 	docker-compose exec app npx prisma migrate deploy
 
+seed: ## Executar seed (dados iniciais) manualmente
+	docker-compose exec app npx prisma db seed
+
 studio: ## Abrir Prisma Studio (interface web do banco)
 	docker-compose exec app npx prisma studio
 

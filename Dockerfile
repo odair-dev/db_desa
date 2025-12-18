@@ -40,8 +40,11 @@ RUN echo '#!/bin/bash' > /app/start.sh && \
     echo 'echo "🔄 Executando migrações..."' >> /app/start.sh && \
     echo 'npx prisma migrate deploy' >> /app/start.sh && \
     echo 'echo "✅ Migrações concluídas!"' >> /app/start.sh && \
+    echo 'echo "🌱 Executando seed (dados iniciais)..."' >> /app/start.sh && \
+    echo 'npx prisma db seed' >> /app/start.sh && \
+    echo 'echo "✅ Dados iniciais carregados!"' >> /app/start.sh && \
     echo 'echo "🚀 Iniciando aplicação..."' >> /app/start.sh && \
-    echo 'npm run start:prod' >> /app/start.sh && \
+    echo 'node dist/src/main.js' >> /app/start.sh && \
     chmod +x /app/start.sh
 
 # Expor a porta da aplicação
